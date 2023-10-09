@@ -6,7 +6,6 @@
 
 #define RAND(a) (rand() % (a - 1))
 #define LEN(a) (sizeof(a) / sizeof(a[0]))
-#define MAX(a, b) ( (a > b) ? a : b )
 
 float *gen(int, int, int);
 float calc_median(float*);
@@ -21,10 +20,10 @@ main()
 {
 	srand(time(NULL));
 	int h = 10;
-	printf("Равномерное распределение\n");
+	printf("\nРавномерное распределение\n");
 	int b = 1;
 	for (int r = 10; r <= 1000; r *= 10) {
-		for (int n = 10000; n <= 100000; n *= 10) {
+		for (int n = 10000; n <= 1000000; n *= 10) {
 			printf("r = %d; n = %d\n", r, n);
 			float *a = gen(n, b, r);
 			for (int i = 1; i < LEN(a); i++) {
@@ -42,7 +41,7 @@ main()
 		}
 	}
 
-	printf("Нормальное распределение\n");
+	printf("\nНормальное распределение\n");
 	b = 0;
 	for (int r = 10; r <= 1000; r *= 10) {
 		for (int n = 10000; n <= 100000; n *= 10) {
@@ -68,8 +67,8 @@ float
 		} else {
 			for (int j = 0; j < 5; j++) {
 				num += RAND(r);
-				num /= 5.0;
 			}
+			num /= 5.0;
 		}
 		a[i] = num;
 	}
@@ -103,8 +102,10 @@ calc_mode(float *a3)
 {
 	int max_count = 0, mode = 0;
 	for (int i = 0; i < LEN(a3); i++) {
-		max_count = MAX(max_count, a3[i]);
-		mode = i;
+		if (a3[i] > max_count){
+			max_count = a3[i];	
+			mode = i;
+		}
 	}
 	return mode;
 }
@@ -132,11 +133,11 @@ float
 	
 	for (int i = 0; i <= h; i++) {
 		for (int j = 0; j < n; j++) {
-			if (y <= ( a[j] < y) + s) {
+			if (y <= a[j] && a[j] < (y + s)) {
 				a2[i] += 1;
-				y += s;
 			}
 		}
+		y += s;
 	}
 	return a2;
 }
@@ -145,11 +146,9 @@ float
 *crt_a3(float* a, int h, int r, int n)
 {
 	float *a3;
-	memset(a3, 0, (h+1)*sizeof(float));
-	int y = 0;
-	float s = (float)r / h;
+	memset(a3, 0, (r)*sizeof(float));
 	
-	for (int i = 0; i < r; i++) {
+	for (int i = 0; i <= h; i++) {
 		for (int j = 0; j < n; j++) {
 			if (a[j] == i) a3[i] += 1;
 		}
